@@ -1,0 +1,29 @@
+{
+    "name": "RoundsTCG",
+    "references": [
+        "UnboundLib",
+        "ModdingUtils",
+        "ModsPlus",
+        "RarityLib",
+        "Unity.TextMeshPro"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Assembly-CSharp.dll",
+        "0Harmony.dll",
+        "BepInEx.dll",
+        "PhotonChat.dll",
+        "PhotonRealtime.dll",
+        "Photon3Unity3D.dll",
+        "PhotonWebSocket.dll",
+        "PhotonUnityNetworking.dll",
+        "PhotonUnityNetworking.Utilities.dll",
+        "ItemShops.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": []
+}
