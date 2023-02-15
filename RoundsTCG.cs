@@ -8,6 +8,7 @@ using UnboundLib.GameModes;
 
 [BepInDependency("com.willis.rounds.unbound")]
 [BepInDependency("pykess.rounds.plugins.moddingutils")]
+[BepInDependency("com.willuwontu.rounds.itemshops")]
 [BepInDependency("com.willis.rounds.modsplus")]
 [BepInDependency("root.rarity.lib")]
 [BepInPlugin(ModId, ModName, ModVersion)]
@@ -16,7 +17,7 @@ public class RoundsTCG : BaseUnityPlugin
 {
     private const string ModId = "com.willis.rounds.tcg";
     private const string ModName = "TCG";
-    private const string ModVersion = "0.0.1";
+    private const string ModVersion = "0.0.2";
     private const string CompatabilityModName = "TCG";
     
     public static RoundsTCG Instance { get; private set; }
