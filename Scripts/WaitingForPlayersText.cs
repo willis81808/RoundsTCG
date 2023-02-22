@@ -7,6 +7,8 @@ using System.Text;
 
 public class WaitingForPlayersText : MonoBehaviour
 {
+    [SerializeField]
+    private TextMeshProUGUI headerText;
     private TextMeshProUGUI text;
 
     private void Awake()
@@ -27,5 +29,7 @@ public class WaitingForPlayersText : MonoBehaviour
             sb.AppendLine(pendingPlayers[i].data.view.Controller.NickName);
         }
         text.text = sb.ToString();
+
+        headerText.gameObject.SetActive(pendingPlayers.Count > 0);
     }
 }

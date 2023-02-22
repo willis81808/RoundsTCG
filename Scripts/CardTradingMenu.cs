@@ -42,6 +42,13 @@ public class CardTradingMenu : MonoBehaviour
     internal List<Tuple<CardPreview, CardPreview>> pendingOffers = new List<Tuple<CardPreview, CardPreview>>();
     internal List<TradeDeal> pendingDeals = new List<TradeDeal>();
 
+    internal List<string> blacklistedCategories = new List<string>
+    {
+        "CardManipulation",
+        "Grants Curses",
+        "GivesNulls"
+    };
+
     internal HashSet<Player> doneTradingPlayers = new HashSet<Player>();
     internal HashSet<TradeDeal> acceptedDeals = new HashSet<TradeDeal>();
     internal HashSet<TradeDeal> myPendingDeals = new HashSet<TradeDeal>();
@@ -56,19 +63,23 @@ public class CardTradingMenu : MonoBehaviour
         confirmButton.interactable = selectedCards.Count == 2;
     }
 
-    private void SetupPlayerCards(Player me)
+    private void SetupPlayerCards(Player me, Player other)
     {
-        PopulateCardView(me, myCardsContent);
+        PopulateCardView(me, other, myCardsContent);
     }
 
     private void SetupTargetCards(Player target)
     {
+        var self = PlayerManager.instance.players.Where(p => p.data.view.IsMine && !p.IsMinion()).First();
+
         titleText.text = $"Trading with: {target.data.view.Controller.NickName}";
-        PopulateCardView(target, targetCardsContent);
+        PopulateCardView(target, self, targetCardsContent);
     }
 
-    private void PopulateCardView(Player player, Transform container)
+    private void PopulateCardView(Player player, Player other, Transform container)
     {
+        var self = PlayerManager.instance.players.Where(p => p.data.view.IsMine && !p.IsMinion()).First();
+
         // disable any previously displayed card views
         foreach (var child in container.GetComponentsInChildren<CardPreview>())
         {
@@ -79,11 +90,27 @@ public class CardTradingMenu : MonoBehaviour
         for (int i = player.data.currentCards.Count - 1; i >= 0; i--)
         {
             var card = player.data.currentCards[i];
+
             var view = Instantiate(previewPrefab, container);
             view.Initialize(player, card, i);
-
+            
             // disable any cards that are part of a currently pending offer
             if (pendingOffers.Where(pair => pair.Item1.cardToDisplay == card || pair.Item2.cardToDisplay == card).Count() > 0)
+            {
+                view.Disable();
+            }
+            // hide any nulled cards
+            else if (card.gameObject.name == "NullManger")
+            {
+                view.gameObject.SetActive(false);
+            }
+            // prevent trading cards that either player is not allowed
+            else if (!ModdingUtils.Utils.Cards.instance.PlayerIsAllowedCard(self, card) || !ModdingUtils.Utils.Cards.instance.PlayerIsAllowedCard(other, card))
+            {
+                view.Disable();
+            }
+            // disable cards in any category blacklisted from trades
+            else if (card.categories.Select(c => c.name.ToLowerInvariant()).Intersect(blacklistedCategories.Select(s => s.ToLowerInvariant())).Count() > 0)
             {
                 view.Disable();
             }
@@ -92,11 +119,17 @@ public class CardTradingMenu : MonoBehaviour
 
     private void SetupPlayerList()
     {
+        var self = PlayerManager.instance.players.Where(p => p.data.view.IsMine && !p.IsMinion()).First();
+
         for (int i = PlayerManager.instance.players.Count - 1; i >= 0; i--)
         {
             var player = PlayerManager.instance.players[i];
             if (player.data.view.IsMine || player.IsMinion()) continue;
-            SetupPlayerListButton(player, () => SetupTargetCards(player));
+            SetupPlayerListButton(player, () =>
+            {
+                SetupTargetCards(player);
+                SetupPlayerCards(self, player);
+            });
         }
     }
 
@@ -172,13 +205,6 @@ public class CardTradingMenu : MonoBehaviour
         dealMenuRoot.gameObject.SetActive(false);
         resultsMenuRoot.gameObject.SetActive(false);
         gameObject.SetActive(true);
-        foreach (var player in PlayerManager.instance.players)
-        {
-            if (player.data.view.IsMine && !player.IsMinion())
-            {
-                SetupPlayerCards(player);
-            }
-        }
         SetupPlayerList();
     }
 

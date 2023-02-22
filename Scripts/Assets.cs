@@ -11,4 +11,5 @@ public class Assets
     internal static AssetBundle Bundle = AssetUtils.LoadAssetBundleFromResources("roundstcg", typeof(RoundsTCG).Assembly);
     
     internal static GameObject ChooseCardShop = Bundle.LoadAsset<GameObject>("Trading Card Menu");
+    internal static GameObject OptInButton = Bundle.LoadAsset<GameObject>("Trade Vote Button");
 }
